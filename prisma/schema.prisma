@@ -5,18 +5,14 @@ generator client {
   provider = "prisma-client-js"
 }
 
-generator typegraphql {
-  provider = "typegraphql-prisma"
-}
-
 datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
 model Comment {
-  id Int @id @default(autoincrement())
-  createdAt DateTime @default(now())
+  id String @id @unique
+  createdAt DateTime  @default(now())
   updatedAt DateTime @updatedAt
   authorName String
   content String
