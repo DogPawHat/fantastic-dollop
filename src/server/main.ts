@@ -2,15 +2,8 @@ import { createServer } from "@graphql-yoga/node";
 import fastify, { FastifyRequest, FastifyReply } from "fastify";
 import fastifyStatic from "@fastify/static";
 import path from "path";
-import { fileURLToPath } from "url";
-import { PrismaClient } from "@prisma/client";
-import schema from "./schema";
-
-const __filename = fileURLToPath(import.meta.url);
-
-const __dirname = path.dirname(__filename);
-
-const prisma = new PrismaClient();
+import schema from "./api/schema";
+import { context } from "./api/context";
 
 // This is the fastify instance you have created
 const app = fastify({ logger: true });
@@ -22,7 +15,7 @@ const graphQLServer = createServer<{
   // Integrate Fastify logger
   logging: app.log,
   schema,
-  context: () => { prisma }
+  context,
 });
 
 app.register(fastifyStatic, {
