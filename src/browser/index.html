@@ -7,6 +7,22 @@
   </head>
   <body>
     <div class="md:container mx-auto">
+      <h1 class="text-2xl font-bold">Discussion</h1>
+      <form id="comment-form" class="w-full my-4" onsubmit="handlePost(this);">
+        <input
+          id="comment-content"
+          name="comment-content"
+          placeholder="What are your thoughts?"
+          class="w-80 border-2 border-solid rounded p-1"
+          type="text"
+        />
+        <button
+          class="text-white bg-indigo-500 border-2 border-solid border-indigo-500 rounded p-1 font-semibold"
+          type="submit"
+        >
+          Comment
+        </button>
+      </form>
       <ul id="comment-list" class="my-4"></ul>
     </div>
   </body>
@@ -21,6 +37,8 @@
     </li>
   </template>
   <script>
+    const commentForm = document.querySelector("form#comment-form");
+    const content = commentForm.querySelector("input#comment-content");
     const list = document.querySelector("ul#comment-list");
     const template = document.querySelector("template#comment");
 
@@ -34,15 +52,6 @@
       }
     `;
 
-    const upvoteMutation = `
-      mutation UpvoteComment($id: ID!) {
-        upvoteComment(id: $id) {
-          ...CommentDetails
-        }
-      }
-      ${commentFragment}
-    `;
-
     const commentsQuery = `
       query GetAllComments {
         comments {
@@ -52,7 +61,40 @@
       ${commentFragment}
     `;
 
+    const postCommentMutation = `
+      mutation PostComment($content: String!) {
+        postComment(content: $content) {
+          ...CommentDetails
+        }
+      }
+      ${commentFragment}
+    `;
+
+    const upvoteMutation = `
+      mutation UpvoteComment($id: ID!) {
+        upvoteComment(id: $id) {
+          ...CommentDetails
+        }
+      }
+      ${commentFragment}
+    `;
+
     const getCommentsOperation = fetch(`/graphql?query=${commentsQuery}`);
+
+    const postComment = (content) =>
+      fetch("/graphql", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          query: postCommentMutation,
+          operationName: "PostComment",
+          variables: {
+            content,
+          },
+        }),
+      });
 
     const upvote = (id) =>
       fetch("/graphql", {
@@ -68,6 +110,11 @@
           },
         }),
       });
+
+    const handlePost = (e) => {
+      postComment(content.value);
+      e.preventDefault();
+    };
 
     getCommentsOperation
       .then((val) => val.json())
