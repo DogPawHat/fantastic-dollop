@@ -1,11 +1,57 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <script src="https://cdn.tailwindcss.com"></script>
-    </head>
-    <body>
-        <h1 class="text-lg">Hello World!</h1>
-    </body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body>
+    <div class="md:container mx-auto">
+      <ul id="comment-list" class="my-4"></ul>
+    </div>
+  </body>
+  <template id="comment">
+    <li class="my-3">
+      <h2 data-block="author-name" class="text-base font-bold">authorName</h2>
+      <span data-block="content" class="text-base">content</span>
+    </li>
+  </template>
+  <script>
+    const list = document.querySelector("ul#comment-list");
+    const template = document.querySelector("template#comment");
+
+    const commentsQuery = `
+      query GetAllComments {
+        comments {
+          id
+          authorName
+          content
+          createdAt
+        }
+      }
+    `;
+
+    const getCommentsOperation = fetch(`/graphql?query=${commentsQuery}`);
+
+    getCommentsOperation
+      .then((val) => val.json())
+      .then(({ data }) => {
+        const comments = data.comments;c|¬
+
+        if (comments && comments.length > 0) {
+          comments.forEach((comment) => {
+            const clone = template.content.cloneNode(true);
+            const authorNameElem = clone.querySelector(
+              `[data-block="author-name"]`
+            );
+            const contentElem = clone.querySelector(`[data-block="content"]`);
+
+            authorNameElem.textContent = comment.authorName;
+            contentElem.textContent = comment.content;
+
+            list.appendChild(clone);
+          });
+        }
+      });
+  </script>
 </html>
