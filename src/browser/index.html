@@ -14,29 +14,65 @@
     <li class="my-3">
       <h2 data-block="author-name" class="text-base font-bold">authorName</h2>
       <span data-block="content" class="text-base">content</span>
+      <div>
+        <button data-block="upvote-btn" class="underline">upvote</button>
+        <span data-block="upvotes">upvotes</span>
+      </div>
     </li>
   </template>
   <script>
     const list = document.querySelector("ul#comment-list");
     const template = document.querySelector("template#comment");
 
+    const commentFragment = `
+      fragment CommentDetails on Comment {
+        id
+        authorName
+        content
+        createdAt
+        upvotes
+      }
+    `;
+
+    const upvoteMutation = `
+      mutation UpvoteComment($id: ID!) {
+        upvoteComment(id: $id) {
+          ...CommentDetails
+        }
+      }
+      ${commentFragment}
+    `;
+
     const commentsQuery = `
       query GetAllComments {
         comments {
-          id
-          authorName
-          content
-          createdAt
+          ...CommentDetails
         }
       }
+      ${commentFragment}
     `;
 
     const getCommentsOperation = fetch(`/graphql?query=${commentsQuery}`);
 
+    const upvote = (id) =>
+      fetch("/graphql", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          query: upvoteMutation,
+          operationName: "UpvoteComment",
+          variables: {
+            id,
+          },
+        }),
+      });
+
     getCommentsOperation
       .then((val) => val.json())
       .then(({ data }) => {
-        const comments = data.comments;c|¬
+        const comments = data.comments;
 
         if (comments && comments.length > 0) {
           comments.forEach((comment) => {
@@ -45,9 +81,13 @@
               `[data-block="author-name"]`
             );
             const contentElem = clone.querySelector(`[data-block="content"]`);
+            const upvotesElm = clone.querySelector(`[data-block="upvotes"]`);
+            const upvoteBtn = clone.querySelector(`[data-block="upvote-btn"]`);
 
             authorNameElem.textContent = comment.authorName;
             contentElem.textContent = comment.content;
+            upvotesElm.textContent = comment.upvotes;
+            upvoteBtn.addEventListener("click", () => upvote(comment.id));
 
             list.appendChild(clone);
           });
