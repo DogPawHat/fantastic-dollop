@@ -3,7 +3,7 @@
 
   "compilerOptions": {
     "lib": ["es2022"],
-    "module": "es2022",
+    "module": "commonjs",
     "target": "es2022",
 
     "moduleResolution": "node",
@@ -25,10 +25,6 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
-  },
-  "ts-node": {
-    // Tell ts-node CLI to install the --loader automatically, explained below
-    "esm": true
   },
   "include": ["src/**/*.ts"]
 }
