@@ -8,7 +8,7 @@
   <body>
     <div class="md:container mx-auto">
       <h1 class="text-2xl font-bold">Discussion</h1>
-      <form id="comment-form" class="w-full my-4" onsubmit="handlePost(this);">
+      <form id="comment-form" class="w-full my-4">
         <input
           id="comment-content"
           name="comment-content"
@@ -115,6 +115,8 @@
       postComment(content.value);
       e.preventDefault();
     };
+
+    commentForm.addEventListener('submit', handlePost)
 
     getCommentsOperation
       .then((val) => val.json())

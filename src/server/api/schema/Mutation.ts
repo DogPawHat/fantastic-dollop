@@ -18,7 +18,7 @@ const Mutation = mutationType({
         return ctx.db.comment.create({
           data: {
             id: v4(),
-            authorName: faker.internet.userName(),
+            authorName: faker.name.findName(),
             content: args.content,
           },
         });
