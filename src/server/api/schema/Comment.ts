@@ -10,9 +10,15 @@ const Comment = objectType({
     t.nonNull.field("updatedAt", {
       type: 'DateTime',
     });
-    t.nonNull.string("authorName");
-    t.nonNull.string("content");
-    t.nonNull.int("upvotes");
+    t.nonNull.string("authorName", {
+      description: "Name of the comment author"
+    });
+    t.nonNull.string("content", {
+      description: "Content of the comment"
+    });
+    t.nonNull.int("upvotes", {
+      description: "Number of upvotes the comment has (can be negative!)"
+    });
   },
 });
 

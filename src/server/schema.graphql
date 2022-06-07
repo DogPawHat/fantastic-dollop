@@ -3,11 +3,16 @@
 
 
 type Comment {
+  """Name of the comment author"""
   authorName: String!
+
+  """Content of the comment"""
   content: String!
   createdAt: DateTime!
   id: ID!
   updatedAt: DateTime!
+
+  """Number of upvotes the comment has (can be negative!)"""
   upvotes: Int!
 }
 
@@ -17,12 +22,20 @@ A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `dat
 scalar DateTime
 
 type Mutation {
+  """Decrement the upvote count of this comment by one"""
   downvoteComment(id: ID!): Comment
+
+  """Post a new comment (with auto-generated author)"""
   postComment(content: String!): Comment
+
+  """Increment the upvote count of this comment by one"""
   upvoteComment(id: ID!): Comment
 }
 
 type Query {
+  """Get a single comment"""
   commentById(id: ID!): Comment
+
+  """Get the full list of comments"""
   comments: [Comment]
 }

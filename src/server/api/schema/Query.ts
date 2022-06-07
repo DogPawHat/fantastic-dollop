@@ -7,6 +7,7 @@ import {
 const Query = queryType({
   definition(t) {
     t.field("commentById", {
+      description: "Get a single comment",
       type: "Comment",
       args: {
         id: nonNull(idArg()),
@@ -21,10 +22,11 @@ const Query = queryType({
     });
     t.list.field("comments", {
       type: "Comment",
+      description: "Get the full list of comments",
       resolve(_root, _args, ctx) {
         return ctx.db.comment.findMany({
           orderBy: {
-            createdAt: "asc",
+            createdAt: "desc",
           },
         });
       },

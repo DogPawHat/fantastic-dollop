@@ -10,6 +10,7 @@ import { faker } from "@faker-js/faker";
 const Mutation = mutationType({
   definition(t) {
     t.field("postComment", {
+      description: "Post a new comment (with auto-generated author)",
       type: "Comment",
       args: {
         content: nonNull(stringArg()),
@@ -25,6 +26,7 @@ const Mutation = mutationType({
       },
     });
     t.field("upvoteComment", {
+      description: "Increment the upvote count of this comment by one",
       type: "Comment",
       args: {
         id: nonNull(idArg()),
@@ -43,6 +45,7 @@ const Mutation = mutationType({
       },
     });
     t.field("downvoteComment", {
+      description: "Decrement the upvote count of this comment by one",
       type: "Comment",
       args: {
         id: nonNull(idArg()),
