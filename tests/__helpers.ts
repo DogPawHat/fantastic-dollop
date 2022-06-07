@@ -24,7 +24,7 @@ export function createTestContext(): TestContext {
   const graphqlCtx = graphqlTestContext();
   const prismaCtx = prismaTestContext();
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const db = await prismaCtx.before();
     const client = await graphqlCtx.before(db);
 
@@ -34,7 +34,7 @@ export function createTestContext(): TestContext {
     });
   });
 
-  afterEach(async () => {
+  afterAll(async () => {
     await graphqlCtx.after();
     await prismaCtx.after();
   });
