@@ -1,8 +1,9 @@
 import { createTestContext } from "../__helpers";
 import { Comment } from "@prisma/client";
 import { gql } from "@urql/core";
-import { result } from "nexus/dist/utils";
-import { pipe, map, toPromise, mergeMap } from "wonka";
+import { pipe, toPromise, mergeMap } from "wonka";
+
+jest.setTimeout(20000);
 
 const ctx = createTestContext();
 
@@ -127,14 +128,14 @@ it("ensures that a multiple comments can be created and retrieved", async () => 
 
   const getContent = (comment: Comment) => comment.content
 
-  expect(getAllCommentsResult.data.comments.length).toEqual(3);
+  expect(getAllCommentsResult.data.comments.length).toBe(3);
   expect(getAllCommentsResult.data.comments.map(getContent)).toContain(commentOne.data.postComment.content);
   expect(getAllCommentsResult.data.comments.map(getContent)).toContain(commentOne.data.postComment.content);
   expect(getAllCommentsResult.data.comments.map(getContent)).toContain(commentOne.data.postComment.content);
 
   const persistedData = await ctx.db.comment.findMany();
 
-  expect(persistedData.length).toEqual(3);
+  expect(persistedData.length).toBe(3);
 });
 
 it("ensures that a comment can be upvoted and downvoted", async () => {
@@ -248,14 +249,28 @@ it("ensures that a comment can be upvoted and downvoted", async () => {
     ),
   ]);
 
-  expect(upvoteOneResult.data.upvoteComment.upvotes).toEqual(1);
-  expect(upvoteThreeResult.data.upvoteComment.upvotes).toEqual(3);
-  expect(downvoteTwoResult.data.downvoteComment.upvotes).toEqual(-2);
-  expect(upvoteDownvoteResult.data.upvoteComment.upvotes).toEqual(4);
+  expect(upvoteOneResult.data.upvoteComment.upvotes).toBe(1);
+  expect(upvoteThreeResult.data.upvoteComment.upvotes).toBe(3);
+  expect(downvoteTwoResult.data.downvoteComment.upvotes).toBe(-2);
+  expect(upvoteDownvoteResult.data.upvoteComment.upvotes).toBe(4);
 
   const persistedData = await ctx.db.comment.findUnique({
     where: { id: upvoteDownvoteResult.data.upvoteComment.id },
   });
 
-  expect(persistedData.upvotes).toEqual(4);
+  expect(persistedData.upvotes).toBe(4);
+});
+
+it("fails if you attempt to upvote a non-existing comment", async () => {
+  const failedUpvote = await ctx.client.mutation(upvoteCommentMutation, { id: "totally-valid-id" }).toPromise();
+
+  expect(failedUpvote.data.upvoteComment).toBeNull()
+  expect(failedUpvote.error).not.toBeNull()
+});
+
+it("fails if you attempt to downvote a non-existing comment", async () => {
+  const failedUpvote = await ctx.client.mutation(downvoteCommentMutation, { id: "totally-valid-id" }).toPromise();
+
+  expect(failedUpvote.data.downvoteComment).toBeNull()
+  expect(failedUpvote.error).not.toBeNull()
 });
